@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SYVE</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { width: 100%; height: 100vh; overflow: hidden; background: #fff; }
+  #viewport { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; overflow: hidden; background: #fff; }
+
+  .nav-item {
+    font-family: 'SuisseIntl', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    line-height: 16px;
+    color: #000;
+    cursor: pointer;
+    display: block;
+    text-decoration: none;
+  }
+  .nav-item.active { text-decoration: underline; }
+  .nav-spacer { height: 16px; }
+
+  #logo {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 14px;
+    height: 68px;
+    width: auto;
+    z-index: 10;
+  }
+
+  #nav-left {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    z-index: 10;
+  }
+
+  #nav-right {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    text-align: right;
+    width: 120px;
+    z-index: 10;
+  }
+
+  #carousel-stage {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 1;
+  }
+
+  .carousel-img {
+    position: absolute;
+    transform-origin: center center;
+    will-change: transform, opacity;
+    overflow: hidden;
+    cursor: pointer;
+  }
+  .carousel-img img, .carousel-img video {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+  }
+  .carousel-img img { object-fit: contain; }
+  .carousel-img video { object-fit: cover; }
+
+  #product-info {
+    position: absolute;
+    left: 12px;
+    bottom: 12px;
+    width: 350px;
+    border: 1px solid #000;
+    padding: 12px;
+    background: #fff;
+    z-index: 10;
+    font-family: 'SuisseIntl', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    line-height: 16px;
+    color: #000;
+  }
+  #product-title { margin-bottom: 32px; }
+  #product-desc { }
+
+  #product-controls {
+    position: absolute;
+    right: 12px;
+    bottom: 12px;
+    width: 350px;
+    z-index: 10;
+  }
+
+  #size-color-row {
+    height: 40px;
+    border: 1px solid #000;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    gap: 12px;
+    font-family: 'SuisseIntl', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    line-height: 16px;
+    color: #000;
+  }
+  .size-item {
+    cursor: pointer;
+  }
+  .size-item.active { text-decoration: underline; }
+  .color-swatch {
+    width: 10px;
+    height: 10px;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .sizes-group { display: flex; gap: 8px; align-items: center; }
+  .colors-group { display: flex; gap: 6px; align-items: center; margin-left: auto; }
+
+  #price-cart-row {
+    height: 40px;
+    border: 1px solid #000;
+    margin-top: -1px;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    font-family: 'SuisseIntl', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    line-height: 16px;
+    color: #000;
+  }
+  #product-price { flex: 1; }
+  #add-to-cart {
+    background: #000;
+    color: #fff;
+    border: none;
+    padding: 0 16px;
+    height: 28px;
+    font-family: 'SuisseIntl', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+  }
+</style>
+</head>
+<body>
+<div id="viewport">
+  <!-- Logo -->
+  <img id="logo" src="assets/logo.svg" alt="SYVE">
+
+  <!-- Left Nav -->
+  <nav id="nav-left">
+    <a class="nav-item active">NEW ARRIVALS</a>
+    <div class="nav-spacer"></div>
+    <a class="nav-item">BAGS</a>
+    <a class="nav-item">WOMEN</a>
+    <a class="nav-item">MEN</a>
+    <div class="nav-spacer"></div>
+    <a class="nav-item">SHOWS</a>
+    <a class="nav-item">ABOUT</a>
+  </nav>
+
+  <!-- Right Nav -->
+  <nav id="nav-right">
+    <a class="nav-item">SEARCH</a>
+    <div class="nav-spacer"></div>
+    <a class="nav-item">ACCOUNT</a>
+    <a class="nav-item">WISHLIST</a>
+    <div class="nav-spacer"></div>
+    <a class="nav-item">BAG</a>
+  </nav>
+
+  <!-- Carousel Stage -->
+  <div id="carousel-stage"></div>
+
+  <!-- Product Info -->
+  <div id="product-info">
+    <div id="product-title"></div>
+    <div id="product-desc"></div>
+  </div>
+
+  <!-- Product Controls -->
+  <div id="product-controls">
+    <div id="size-color-row">
+      <div class="sizes-group" id="sizes-group"></div>
+      <div class="colors-group" id="colors-group"></div>
+    </div>
+    <div id="price-cart-row">
+      <span id="product-price"></span>
+      <button id="add-to-cart">Add to Cart</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  // ── Product data ──────────────────────────────────────────────────────────
+  var PRODUCTS = [
+    { title: 'Oversized Wool Coat', description: 'Double-faced wool blend with structured shoulders and drop hem. Dry clean only.', price: '$1,290', sizes: ['XS','S','M','L','XL'], activeSize: 1, colors: ['#2C2C2C','#C4B49A','#8B7355'] },
+    { title: 'Leather Tote Bag', description: 'Full-grain calfskin with brass hardware and suede interior lining.', price: '$890', sizes: ['ONE SIZE'], activeSize: 0, colors: ['#1A1A1A','#8B6914','#C8B8A2'] },
+    { title: 'Silk Wrap Dress', description: 'Fluid 100% silk charmeuse with adjustable tie waist and bias cut.', price: '$645', sizes: ['XS','S','M','L'], activeSize: 2, colors: ['#D4C5B0','#2C2C2C','#8B3A3A'] },
+    { title: 'Tailored Trousers', description: 'High-rise cut in Italian wool gabardine with side zip closure.', price: '$520', sizes: ['34','36','38','40','42'], activeSize: 2, colors: ['#1A1A1A','#4A4A4A','#C4B49A'] },
+    { title: 'Cashmere Sweater', description: 'Grade-A Mongolian cashmere in relaxed fit with ribbed cuffs and hem.', price: '$780', sizes: ['XS','S','M','L','XL'], activeSize: 1, colors: ['#E8DDD3','#2C2C2C','#6B8E6B'] },
+    { title: 'Structured Blazer', description: 'Single-button closure in Japanese wool with half-canvas construction.', price: '$1,100', sizes: ['34','36','38','40'], activeSize: 1, colors: ['#2C2C2C','#1A3A1A','#8B7355'] },
+    { title: 'Mini Crossbody', description: 'Pebbled leather with antique gold chain and magnetic snap closure.', price: '$460', sizes: ['ONE SIZE'], activeSize: 0, colors: ['#C8B8A2','#1A1A1A','#8B3A3A'] }
+  ];
+
+  // ── Constants ─────────────────────────────────────────────────────────────
+  var TOTAL = 7;
+  var REF_W = 1440;
+  var REF_H = 900;
+  var DWELL_THRESHOLD = 80;
+  var VIDEO_SCRUB_SPEED = 0.008;
+  var VIDEO_EXIT_THRESHOLD = 150;
+  var EASE = 0.12;
+
+  var PLACEHOLDER = 'data:image/svg+xml,' + encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="620" height="835" viewBox="0 0 620 835">' +
+    '<rect width="620" height="835" fill="#E8DDD3"/></svg>'
+  );
+
+  // ── State ─────────────────────────────────────────────────────────────────
+  var scrollPos = 0;       // current rendered position (float)
+  var targetPos = 0;       // snap target (integer)
+  var isSnapped = true;
+  var dwellAccum = 0;
+  var centeredIndex = 0;   // which ITEMS[] index is at center slot 0
+  var videoIsLoaded = [];  // true if video element loaded successfully
+  var videoEls = [];       // DOM video/img elements per item
+  var videoBoundaryAccum = 0;
+  var lastSeekTime = 0;
+  var videoScrubPos = 0;   // tracks scrub position independently of currentTime
+  var SLOTS = {};
+  var rafId = null;
+
+  // ── Build slot geometry ───────────────────────────────────────────────────
+  function buildSlots() {
+    var vw = window.innerWidth;
+    var vh = window.innerHeight;
+    var sx = vw / REF_W;
+    var sy = vh / REF_H;
+
+    var heroH = 640 * sy;
+    var heroTop = 130 * sy;
+    var heroCy = heroTop + heroH / 2;
+    var heroW = 520 * sx;
+    var thumbH = (194 - 40 * (194 / 835)) * sy;
+    var thumbW = 144 * sx;
+    var thumbCy = vh * 0.5;
+
+    SLOTS = {
+      '-3': { cx: -80  * sx, cy: thumbCy, w: thumbW, h: thumbH, opacity: 0, z: 1 },
+      '-2': { cx: 144  * sx, cy: thumbCy, w: thumbW, h: thumbH, opacity: 1, z: 2 },
+      '-1': { cx: 368  * sx, cy: thumbCy, w: thumbW, h: thumbH, opacity: 1, z: 3 },
+       '0': { cx: vw / 2,    cy: heroCy,  w: heroW,  h: heroH,  opacity: 1, z: 5 },
+       '1': { cx: 1072 * sx, cy: thumbCy, w: thumbW, h: thumbH, opacity: 1, z: 3 },
+       '2': { cx: 1296 * sx, cy: thumbCy, w: thumbW, h: thumbH, opacity: 1, z: 2 },
+       '3': { cx: 1520 * sx, cy: thumbCy, w: thumbW, h: thumbH, opacity: 0, z: 1 }
+    };
+  }
+
+  function getSlot(offset) {
+    var clamped = Math.max(-3, Math.min(3, offset));
+    var lo = Math.floor(clamped);
+    var hi = Math.ceil(clamped);
+    var t = clamped - lo;
+    var a = SLOTS[String(lo)];
+    var b = SLOTS[String(hi)];
+    if (lo === hi) return { cx: a.cx, cy: a.cy, w: a.w, h: a.h, opacity: a.opacity, z: a.z };
+    return {
+      cx:      a.cx + (b.cx - a.cx) * t,
+      cy:      a.cy + (b.cy - a.cy) * t,
+      w:       a.w  + (b.w  - a.w)  * t,
+      h:       a.h  + (b.h  - a.h)  * t,
+      opacity: a.opacity + (b.opacity - a.opacity) * t,
+      z:       Math.round(a.z + (b.z - a.z) * t)
+    };
+  }
+
+  function normalizeOffset(offset) {
+    offset = offset % TOTAL;
+    if (offset > TOTAL / 2) offset -= TOTAL;
+    if (offset < -TOTAL / 2) offset += TOTAL;
+    return offset;
+  }
+
+  // ── DOM setup ─────────────────────────────────────────────────────────────
+  var stage = document.getElementById('carousel-stage');
+  var wrappers = [];
+
+  function createCarousel() {
+    stage.innerHTML = '';
+    wrappers = [];
+
+    for (var i = 0; i < TOTAL; i++) {
+      var wrapper = document.createElement('div');
+      wrapper.className = 'carousel-img';
+
+      var src = 'assets/vid' + (i + 1) + '.mov';
+      var vid = document.createElement('video');
+      vid.src = src;
+      vid.muted = true;
+      vid.setAttribute('playsinline', '');
+      vid.setAttribute('preload', 'auto');
+      vid.loop = false;
+
+      (function(idx, videoEl, wrap) {
+        videoIsLoaded[idx] = false;
+        videoEl.addEventListener('loadedmetadata', function() {
+          videoIsLoaded[idx] = true;
+        });
+        videoEl.addEventListener('error', function() {
+          videoIsLoaded[idx] = false;
+          wrap.removeChild(videoEl);
+          var img = document.createElement('img');
+          img.src = PLACEHOLDER;
+          wrap.appendChild(img);
+          videoEls[idx] = img;
+        });
+      })(i, vid, wrapper);
+
+      videoEls[i] = vid;
+      wrapper.appendChild(vid);
+      stage.appendChild(wrapper);
+      wrappers.push(wrapper);
+    }
+  }
+
+  // ── Render frame ──────────────────────────────────────────────────────────
+  function applySlot(wrapper, slotData) {
+    var left = slotData.cx - slotData.w / 2;
+    var top  = slotData.cy - slotData.h / 2;
+    wrapper.style.left    = left + 'px';
+    wrapper.style.top     = top  + 'px';
+    wrapper.style.width   = slotData.w + 'px';
+    wrapper.style.height  = slotData.h + 'px';
+    wrapper.style.opacity = slotData.opacity;
+    wrapper.style.zIndex  = slotData.z;
+  }
+
+  function render() {
+    for (var i = 0; i < TOTAL; i++) {
+      var rawOffset = i - scrollPos;
+      var offset = normalizeOffset(rawOffset);
+      applySlot(wrappers[i], getSlot(offset));
+    }
+  }
+
+  // ── Update product UI ─────────────────────────────────────────────────────
+  function updateProductUI(idx) {
+    var p = PRODUCTS[idx];
+    document.getElementById('product-title').textContent = p.title;
+    document.getElementById('product-desc').textContent = p.description;
+    document.getElementById('product-price').textContent = p.price;
+
+    var sg = document.getElementById('sizes-group');
+    sg.innerHTML = '';
+    p.sizes.forEach(function(s, si) {
+      var el = document.createElement('span');
+      el.className = 'size-item' + (si === p.activeSize ? ' active' : '');
+      el.textContent = s;
+      el.addEventListener('click', function() {
+        p.activeSize = si;
+        updateProductUI(idx);
+      });
+      sg.appendChild(el);
+    });
+
+    var cg = document.getElementById('colors-group');
+    cg.innerHTML = '';
+    p.colors.forEach(function(c) {
+      var el = document.createElement('div');
+      el.className = 'color-swatch';
+      el.style.background = c;
+      cg.appendChild(el);
+    });
+  }
+
+  // ── Centered item tracking ────────────────────────────────────────────────
+  var lastCenteredItem = -1;
+
+  function checkCenteredChange() {
+    var snapIdx = ((centeredIndex % TOTAL) + TOTAL) % TOTAL;
+    if (snapIdx !== lastCenteredItem) {
+      lastCenteredItem = snapIdx;
+      updateProductUI(snapIdx);
+
+      // Pause all videos except center
+      for (var i = 0; i < TOTAL; i++) {
+        var el = videoEls[i];
+        if (el && el.tagName === 'VIDEO') {
+          if (i !== snapIdx) {
+            el.pause();
+            el.currentTime = 0;
+          }
+        }
+      }
+
+      // Reset and play center video
+      videoScrubPos = 0;
+      videoBoundaryAccum = 0;
+      var centerVid = videoEls[snapIdx];
+      if (centerVid && centerVid.tagName === 'VIDEO' && videoIsLoaded[snapIdx]) {
+        centerVid.currentTime = 0;
+        centerVid.play();
+      }
+    }
+  }
+
+  // ── Scroll handling ───────────────────────────────────────────────────────
+  function handleScroll(delta) {
+    var snapIdx = ((centeredIndex % TOTAL) + TOTAL) % TOTAL;
+    var centerEl = videoEls[snapIdx];
+    var isCenterVideo = centerEl && centerEl.tagName === 'VIDEO' && videoIsLoaded[snapIdx];
+
+    if (isSnapped) {
+      if (isCenterVideo) {
+        var dur = centerEl.duration;
+        if (dur && !isNaN(dur)) {
+          if (!centerEl.paused) centerEl.pause();
+
+          // Track position separately — not tied to currentTime
+          videoScrubPos += delta * VIDEO_SCRUB_SPEED;
+
+          var atEnd   = videoScrubPos >= dur;
+          var atStart = videoScrubPos <= 0;
+
+          if (atEnd || atStart) {
+            videoScrubPos = atEnd ? dur : 0;
+            centerEl.currentTime = videoScrubPos;
+            videoBoundaryAccum += Math.abs(delta);
+            if (videoBoundaryAccum > VIDEO_EXIT_THRESHOLD) {
+              videoBoundaryAccum = 0;
+              var dir = delta > 0 ? 1 : -1;
+              moveCarousel(dir);
+            }
+          } else {
+            videoBoundaryAccum = 0;
+            // Throttle actual DOM seek to ~30fps to avoid glitches
+            var now = performance.now();
+            if (now - lastSeekTime > 32) {
+              centerEl.currentTime = videoScrubPos;
+              lastSeekTime = now;
+            }
+          }
+          return;
+        }
+      }
+
+      // Dwell
+      dwellAccum += delta;
+      if (Math.abs(dwellAccum) > DWELL_THRESHOLD) {
+        var direction = dwellAccum > 0 ? 1 : -1;
+        dwellAccum = 0;
+        moveCarousel(direction);
+      }
+    }
+  }
+
+  function moveCarousel(dir) {
+    targetPos += dir;
+    isSnapped = false;
+    videoBoundaryAccum = 0;
+  }
+
+  // ── Animation loop ────────────────────────────────────────────────────────
+  function tick() {
+    var diff = targetPos - scrollPos;
+
+    if (!isSnapped) {
+      scrollPos += diff * EASE;
+      if (Math.abs(diff) < 0.001) {
+        scrollPos = targetPos;
+        isSnapped = true;
+        dwellAccum = 0;
+        centeredIndex = (((Math.round(targetPos) % TOTAL) + TOTAL) % TOTAL);
+        checkCenteredChange();
+      }
+    }
+
+    render();
+    rafId = requestAnimationFrame(tick);
+  }
+
+  // ── Event listeners ───────────────────────────────────────────────────────
+  window.addEventListener('wheel', function(e) {
+    e.preventDefault();
+    var delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+    handleScroll(delta);
+  }, { passive: false });
+
+  var touchStartX = 0;
+  var touchLastX = 0;
+  window.addEventListener('touchstart', function(e) {
+    touchStartX = e.touches[0].clientX;
+    touchLastX = touchStartX;
+  }, { passive: true });
+
+  window.addEventListener('touchmove', function(e) {
+    var x = e.touches[0].clientX;
+    var delta = touchLastX - x;
+    touchLastX = x;
+    handleScroll(delta);
+  }, { passive: true });
+
+  window.addEventListener('resize', function() {
+    buildSlots();
+    render();
+  });
+
+  // ── Init ──────────────────────────────────────────────────────────────────
+  buildSlots();
+  createCarousel();
+  checkCenteredChange();
+  tick();
+
+})();
+</script>
+</body>
+</html>
