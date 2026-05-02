@@ -156,55 +156,45 @@
     letter-spacing: 0.5px;
   }
 
-  @media (max-width: 768px) {
-    #logo {
-      height: 40px;
-      top: 12px;
-    }
+  body.is-mobile #nav-right { display: none; }
 
-    #nav-right { display: none; }
+  body.is-mobile #nav-left {
+    position: absolute;
+    top: auto;
+    bottom: 132px;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
 
-    #nav-left {
-      top: auto;
-      bottom: 132px;
-      left: 0;
-      width: 100%;
-      display: flex;
-      justify-content: center;
-    }
+  body.is-mobile #product-info {
+    left: 0;
+    bottom: 80px;
+    width: 100%;
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+    padding: 10px 12px;
+  }
 
-    #nav-left .nav-item {
-      font-size: 11px;
-    }
+  body.is-mobile #product-title { margin-bottom: 8px; }
 
-    #product-info {
-      left: 0;
-      bottom: 80px;
-      width: 100%;
-      border-left: none;
-      border-right: none;
-      border-bottom: none;
-      padding: 10px 12px;
-    }
+  body.is-mobile #product-controls {
+    right: 0;
+    bottom: 0;
+    width: 100%;
+  }
 
-    #product-title { margin-bottom: 8px; }
+  body.is-mobile #size-color-row {
+    border-left: none;
+    border-right: none;
+  }
 
-    #product-controls {
-      right: 0;
-      bottom: 0;
-      width: 100%;
-    }
-
-    #size-color-row {
-      border-left: none;
-      border-right: none;
-    }
-
-    #price-cart-row {
-      border-left: none;
-      border-right: none;
-      border-bottom: none;
-    }
+  body.is-mobile #price-cart-row {
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
   }
 </style>
 </head>
@@ -265,6 +255,12 @@
   ];
 
   // ── Constants ─────────────────────────────────────────────────────────────
+  // Detect real device width — screen.width is never affected by iframe scaling
+  var SCREEN_W = Math.min(window.screen.width, window.screen.height);
+  var SCREEN_H = Math.max(window.screen.width, window.screen.height);
+  var IS_MOBILE = SCREEN_W <= 768;
+  if (IS_MOBILE) document.body.classList.add('is-mobile');
+
   var TOTAL = 7;
   var REF_W = 1440;
   var REF_H = 900;
@@ -294,12 +290,14 @@
 
   // ── Build slot geometry ───────────────────────────────────────────────────
   function buildSlots() {
-    var vw = window.innerWidth;
-    var vh = window.innerHeight;
+    // On mobile inside a Tilda iframe, innerWidth may be the desktop container width.
+    // Use actual screen dimensions for geometry so carousel fills the real screen.
+    var vw = IS_MOBILE ? SCREEN_W : window.innerWidth;
+    var vh = IS_MOBILE ? SCREEN_H : window.innerHeight;
     var sx = vw / REF_W;
     var sy = vh / REF_H;
 
-    var isMobile = vw <= 768;
+    var isMobile = IS_MOBILE;
 
     var heroW, heroH, heroTop, heroCy, thumbW, thumbH, thumbCy;
 
