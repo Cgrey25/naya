@@ -255,10 +255,7 @@
   ];
 
   // ── Constants ─────────────────────────────────────────────────────────────
-  // Detect real device width — screen.width is never affected by iframe scaling
-  var SCREEN_W = Math.min(window.screen.width, window.screen.height);
-  var SCREEN_H = Math.max(window.screen.width, window.screen.height);
-  var IS_MOBILE = SCREEN_W <= 768;
+  var IS_MOBILE = Math.min(window.screen.width, window.screen.height) <= 768;
   if (IS_MOBILE) document.body.classList.add('is-mobile');
 
   var TOTAL = 7;
@@ -290,10 +287,8 @@
 
   // ── Build slot geometry ───────────────────────────────────────────────────
   function buildSlots() {
-    // On mobile inside a Tilda iframe, innerWidth may be the desktop container width.
-    // Use actual screen dimensions for geometry so carousel fills the real screen.
-    var vw = IS_MOBILE ? SCREEN_W : window.innerWidth;
-    var vh = IS_MOBILE ? SCREEN_H : window.innerHeight;
+    var vw = window.innerWidth;
+    var vh = window.innerHeight;
     var sx = vw / REF_W;
     var sy = vh / REF_H;
 
