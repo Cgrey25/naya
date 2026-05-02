@@ -6,8 +6,9 @@
 <title>SYVE</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { width: 100%; height: 100vh; overflow: hidden; background: #fff; }
-  #viewport { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; overflow: hidden; background: #fff; }
+  html { height: 100%; }
+  body { width: 100%; height: 100%; overflow: hidden; background: #fff; }
+  #viewport { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; background: #fff; }
 
   .nav-item {
     font-family: 'SuisseIntl', 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -287,8 +288,9 @@
 
   // ── Build slot geometry ───────────────────────────────────────────────────
   function buildSlots() {
-    var vw = window.innerWidth;
-    var vh = window.innerHeight;
+    var el = document.getElementById('viewport');
+    var vw = el.clientWidth  || window.innerWidth;
+    var vh = el.clientHeight || window.innerHeight;
     var sx = vw / REF_W;
     var sy = vh / REF_H;
 
