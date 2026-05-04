@@ -366,27 +366,46 @@
       var wrapper = document.createElement('div');
       wrapper.className = 'carousel-img';
 
+      // Placeholder always visible underneath
+      var placeholder = document.createElement('img');
+      placeholder.src = PLACEHOLDER;
+      placeholder.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;';
+      wrapper.appendChild(placeholder);
+
       var src = 'assets/vid' + (i + 1) + '.mov';
       var vid = document.createElement('video');
       vid.src = src;
       vid.muted = true;
       vid.setAttribute('playsinline', '');
-      vid.setAttribute('preload', 'auto');
+      vid.setAttribute('autoplay', '');
+      vid.setAttribute('preload', 'metadata');
       vid.loop = false;
+      vid.style.opacity = '0'; // hidden until loaded
 
       (function(idx, videoEl, wrap) {
         videoIsLoaded[idx] = false;
+
         videoEl.addEventListener('loadedmetadata', function() {
           videoIsLoaded[idx] = true;
+          videoEl.style.opacity = '1';
         });
+
         videoEl.addEventListener('error', function() {
           videoIsLoaded[idx] = false;
           wrap.removeChild(videoEl);
-          var img = document.createElement('img');
-          img.src = PLACEHOLDER;
-          wrap.appendChild(img);
-          videoEls[idx] = img;
+          videoEls[idx] = wrap.querySelector('img');
         });
+
+        // Fallback: if video hasn't loaded in 3s, just use placeholder
+        var t = setTimeout(function() {
+          if (!videoIsLoaded[idx]) {
+            videoIsLoaded[idx] = false;
+            if (videoEl.parentNode) wrap.removeChild(videoEl);
+            videoEls[idx] = wrap.querySelector('img');
+          }
+        }, 3000);
+
+        videoEl.addEventListener('loadedmetadata', function() { clearTimeout(t); });
       })(i, vid, wrapper);
 
       videoEls[i] = vid;
