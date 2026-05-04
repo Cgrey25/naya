@@ -579,10 +579,23 @@
   });
 
   // ── Init ──────────────────────────────────────────────────────────────────
-  buildSlots();
-  createCarousel();
-  checkCenteredChange();
-  tick();
+  function init() {
+    buildSlots();
+    createCarousel();
+    checkCenteredChange();
+    tick();
+    // Re-measure after first paint in case iframe wasn't sized yet
+    requestAnimationFrame(function() {
+      buildSlots();
+      render();
+    });
+  }
+
+  if (document.readyState === 'complete') {
+    init();
+  } else {
+    window.addEventListener('load', init);
+  }
 
 })();
 </script>
