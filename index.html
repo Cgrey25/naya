@@ -291,6 +291,16 @@
     var el = document.getElementById('viewport');
     var vw = el.clientWidth  || window.innerWidth;
     var vh = el.clientHeight || window.innerHeight;
+
+    // DEBUG — remove after fix
+    var dbg = document.getElementById('debug-overlay');
+    if (!dbg) {
+      dbg = document.createElement('div');
+      dbg.id = 'debug-overlay';
+      dbg.style.cssText = 'position:absolute;top:4px;left:4px;z-index:999;background:rgba(255,0,0,0.8);color:#fff;font-size:11px;padding:4px 6px;font-family:monospace;pointer-events:none;';
+      document.getElementById('viewport').appendChild(dbg);
+    }
+    dbg.textContent = 'vw=' + vw + ' vh=' + vh + ' mob=' + IS_MOBILE + ' scr=' + window.screen.width + 'x' + window.screen.height + ' win=' + window.innerWidth + 'x' + window.innerHeight;
     var sx = vw / REF_W;
     var sy = vh / REF_H;
 
